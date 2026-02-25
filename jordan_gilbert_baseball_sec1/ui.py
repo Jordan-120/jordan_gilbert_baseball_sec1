@@ -1,3 +1,28 @@
+import db
+
+
+#Choice #1
+def display_lineup(players):
+
+#Choice #2
+def add_player(players):
+
+#Choice #3
+def remove_player(players):
+
+#Choice #4
+def move_player(players):
+
+#Choice #5
+def edit_player_position(players):
+
+#Choice #6
+def edit_player_stats(players):
+
+#Choice #7
+def exit_program(players):
+
+
 #did best to make the menu look like the pdf example
 def display_menu():
     print("Console")
@@ -14,6 +39,9 @@ def display_menu():
     print("===========================================================")
     print()
 
+
+
+
 #Thought Case would be cleaner then a bunch of if-else statements
 def main():
     while True:
@@ -22,22 +50,29 @@ def main():
         #had syntax issuies with print, fixed with seperate line
         match choice:
             case "1":
-                print("Display lineup selected")
+                display_lineup(players):
+                print()
             case "2":
-                print("Add player selected")
+                def add_player(players):
+                print()
             case "3":
-                print("Remove player selected")
+                def remove_player(players):
+                print()
             case "4":
-                print("Move player selected")
+                def move_player(players):
+                print()
             case "5":
-                print("Edit player position selected")
+                def edit_player_position(players):
+                print()
             case "6":
-                print("Edit player stats selected")
+                def edit_player_stats(players):
+                print()
             case "7":
-                print("Exiting program...")
+                def exit_program(players):
+                print()
                 break
             case _:
-                print("Invalid option. Please try again.")
+                print("Invalid try again.")
 
         input("enter somthing to return")
 
