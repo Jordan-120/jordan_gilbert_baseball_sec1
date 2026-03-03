@@ -1,148 +1,170 @@
+# ui.py
 import db
-import objects
+from datetime import date, datetime
 
-#have put in until object import fix
 positions = ("C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "P")
+double_line = "=" * 64
+single_line = "-" * 64
 
-#Choice #1
-def display_lineup(players):
-    print("{:<5}{:<15}{:<6}{:<8}{:<8}{:<6}".format("#","player","POS","AB","H","AVG"))
-    print("-" * 50)
+#1 - Display lineup
+def display_lineup(lineup):
+    print("   {:<35}{:<8}{:>7}{:>6}{:>8}".format("Player", "POS", "AB", "H", "AVG"))
+    print(single_line)
 
     number = 1
-    for player in players:
-        name = player[0]
-        pos = player[1]
-        at_bats = int(player[2])
-        hits = int(player[3])
+    for player in lineup:
+        print("{:<2} {:<35}{:<8}{:>7}{:>6}{:>8.3f}".format(
+            number, player.full_name, player.position, player.at_bats, player.hits, player.avg
+        ))
+        number += 1
 
-        try:
-            avg = round(hits / at_bats, 3)
-        except ZeroDivisionError:
-            avg = 0.0
+#2 - Display Lineup
+def add_player(lineup):
+    first = input("First name: ")
+    last = input("Last name: ")
+    position = input("Position: ")
 
-            print("{:<5}{:<15}{:<6}{:<8}{:<8}{:<6}".format("#","player","POS","AB","H","AVG"))
-            number += 1
-
-#Choice #2
-def add_player(players):
-    name = input("Name:")
-    position = input("Postions:")
-
-    while position not in positions: #Learned I have to capitalize
+    while position not in positions:
         print("please try again")
-        position = input("postion")
+        position = input("Position: ")
 
     try:
-        at_bats = int(input("At bats:"))
-        hits = int(input("Hits:"))
-        if at_bats <0 or hits <0 or hits > at_bats:
+        at_bats = int(input("At bats: "))
+        hits = int(input("Hits: "))
+        if at_bats < 0 or hits < 0 or hits > at_bats:
             print("please try again")
             return
     except ValueError:
         print("please try again")
         return
-    
-    players.append([name, position, at_bats, hits])
-    print(f"{name} added")
 
+    import objects
+    player = objects.Player(first, last, position, at_bats, hits)
+    lineup.add_player(player)
+    print(f"{player.full_name} was added.")
 
-#Choice #3
-def remove_player(players):
+#3 - Remove PLayer
+def remove_player(lineup):
     try:
-        number = int(input("number:"))
-        if number < 1 or number > len(players):
+        number = int(input("number: "))
+        if number < 1 or number > len(lineup):
             print("please try again")
             return
     except ValueError:
         print("invaild int")
         return
-    
-    player = players.pop(number - 1) #found pop best method
-    print(f"{player[0]} deleted")
 
-#Choice #4
-def move_player(players):
+    player = lineup.remove_player(number)
+    print(f"{player.full_name} deleted")
+
+#4 - Move Player -- Still working on
+def move_player(lineup):
     try:
-        current = int(input("current lineup:"))
-        if current <1 or current > len(players):
+        current = int(input("# of the Player to move: "))
+        if current < 1 or current > len(lineup):
             print("please try again")
             return
     except ValueError:
         print("invaild int")
         return
-    player = players.pop(current-1)
 
     try:
-        new = int(input("NEw lineup:"))
-        if new <1 or new > len(players) +1:
+        new = int(input("# to move to: "))
+        if new < 1 or new > len(lineup) + 1:
             print("please try again")
-            player.insert(current - 1, player)
             return
     except ValueError:
         print("invaild int")
-        players.insert(current = 1, player)
         return
-    players.insert(new - 1, player)
-    print(f"{player[0]} moved")
 
-#Choice #5
-def edit_player_position(players):
+    player = lineup.move_player(current, new)
+    print(f"{player.full_name} at postion #{current} moved to postion #{new}")
+
+#5 - Edit player -- Still working on
+def edit_player_position(lineup):
     try:
-        number = int(input("Lineup number:"))
-        if number <1 or number >len(players):
+        number = int(input("Postion number: "))
+        if number < 1 or number > len(lineup):
             print("invaild")
             return
     except ValueError:
         print("invaild int")
         return
-    player = player[number -1]
-    print(f"player:{player[0]} at PSO:{player[1]}")
-    position = input("New postion")
+
+    player = lineup.get_player(number)
+    print(f"Player: {player.full_name}, Postion: {player.position}")
+
+    position = input("New postion: ")
     while position not in positions:
         print("invaild, try again")
-        position = input("new postion")
+        position = input("New postion: ")
 
-    player[1] = position
-    print(f"{player[0]} updated")
+    lineup.edit_player_position(number, position)
+    print(f"{player.full_name} updated")
 
-
-#Choice #6
-def edit_player_stats(players):
-    try: 
-        number = int(input("Lineup number:"))
-        if number <1 or number > len(players):
+#5 - Edit player STATS -- Still working on
+def edit_player_stats(lineup):
+    try:
+        number = int(input("Postion number: "))
+        if number < 1 or number > len(lineup):
             print("invaild")
             return
     except ValueError:
         print("invaild int")
         return
-    player = players[number -1]
-    try: 
-        at_bats = int(input("At bats:"))
-        hits = int(input("hits:"))
 
-        if at_bats <0 or hits <0 or hits > at_bats:
+    player = lineup.get_player(number)
+
+    try:
+        at_bats = int(input("At bats: "))
+        hits = int(input("hits: "))
+        if at_bats < 0 or hits < 0 or hits > at_bats:
             print("invaid input")
             return
     except ValueError:
         print("invalid int")
         return
-    player[2] = at_bats
-    player[3] = hits
-    print(f"{player[0]} updated")
 
+    lineup.edit_player_stats(number, at_bats, hits)
+    print(f"{player.full_name} updated")
 
-#Choice #7
-def exit_program(players):
-    print("Exiting Program....")
+# want to allow as option 8 to call again
+def get_game_date():
+    game_date_str = input("GAME DATE: ").strip()
+    if game_date_str == "":
+        return None
 
+    while True:
+        try:
+            return datetime.strptime(game_date_str, "%Y-%m-%d").date()
+        except ValueError:
+            print("Invalid date format EX: YYYY-MM-DD.")
+            game_date_str = input("GAME DATE:").strip()
+            if game_date_str == "":
+                return None
 
-#did best to make the menu look like the pdf example
-def display_menu():
-    print("Console")
-    print("============================================================")
-    print("                Baseball Team Manager")
+# Displays of UI
+def display_menu(current_date, game_date):
+    print(double_line)
+    print("                     Baseball Team Manager") #6 tabss used
+    print()
+    print(f"CURRENT DATE:                                         {current_date:%Y-%m-%d}") #finding best format
+    if game_date is None:
+        print("GAME DATE:                                               Unknown")
+    else:
+        print(f"GAME DATE:                                            {game_date:%Y-%m-%d}")
+
+    if game_date is not None:  #finding best format
+        days_until = (game_date - current_date).days
+        if days_until > 0  < 10:
+            print(f"DAYS UNTIL GAME:                                               {days_until}")
+        elif days_until >= 10:
+            print(f"DAYS UNTIL GAME:                                              {days_until}")
+        elif days_until >= 100:
+            print(f"DAYS UNTIL GAME:                                             {days_until}")
+
+    #Base MEnu
+    print(double_line)
     print("MENU OPTIONS")
     print("1 - Display lineup")
     print("2 - Add player")
@@ -151,49 +173,57 @@ def display_menu():
     print("5 - Edit player position")
     print("6 - Edit player stats")
     print("7 - Exit program")
-    print("===========================================================")
     print()
+    print("POSITIONS")
+    print(", ".join(positions))
+    print(single_line)
 
-
-
-
-#Thought Case would be cleaner then a bunch of if-else statements
 def main():
-    players = db.read_players()
+    lineup = db.read_lineup()
+    current_date = date.today() #Dates, still be adjusted
+    game_date = get_game_date()
+
     while True:
-        display_menu()
-        choice = input("Select what you would like to do (1-7): ")
-        #had syntax issuies with print, fixed with seperate line
-        match choice:
+        display_menu(current_date, game_date)
+        choice = input("Menu option: ").strip()
+
+        match choice: #LOVE CASE, Always use when I can
             case "1":
-                display_lineup(players)
+                display_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "2":
-                add_player(players)
-                db.write_players(players)
+                add_player(lineup)
+                db.write_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "3":
-                remove_player(players)
-                db.write_players(players)
+                remove_player(lineup)
+                db.write_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "4":
-                move_player(players)
-                db.write_players(players)
+                move_player(lineup)
+                db.write_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "5":
-                edit_player_position(players)
-                db.write_players(players)
+                edit_player_position(lineup)
+                db.write_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "6":
-                edit_player_stats(players)
-                db.write_players(players)
+                edit_player_stats(lineup)
+                db.write_lineup(lineup)
+                print()
+                print("~ Press Enter key to continue ~")
             case "7":
-                exit_program(players)
-                print("Program End")
+                print("Program Ended")
                 break
             case _:
                 print("Invalid try again.")
 
-        input("enter somthing to return")
+        input()
 
 if __name__ == "__main__":
     main()
-
-'''
-Use this for documentation
-'''
