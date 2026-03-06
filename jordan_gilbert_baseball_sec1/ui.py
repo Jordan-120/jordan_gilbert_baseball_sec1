@@ -1,4 +1,11 @@
 # ui.py
+"""
+User interface module for the Baseball Team Manager application.
+
+This module handles menu display, user input, lineup display, player
+management actions, and game date handling.
+"""
+
 import db
 from datetime import date, datetime
 
@@ -6,8 +13,17 @@ positions = ("C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "P")
 double_line = "=" * 64
 single_line = "-" * 64
 
+# =====================================================
+#               Event Handlers
+# =====================================================
 #1 - Display lineup
 def display_lineup(lineup):
+    """
+    Display the current baseball lineup in a formatted table.
+
+    Args:
+        lineup: A collection of player objects to display.
+    """
     print("   {:<35}{:<8}{:>7}{:>6}{:>8}".format("Player", "POS", "AB", "H", "AVG"))
     print(single_line)
 
@@ -20,6 +36,15 @@ def display_lineup(lineup):
 
 #2 - Display Lineup
 def add_player(lineup):
+    """
+    Prompt the user for player information and add a new player to the lineup.
+
+    Validates the player's position, at-bats, and hits before creating and
+    adding the player object.
+
+    Args:
+        lineup: The lineup object that stores players.
+    """
     first = input("First name: ")
     last = input("Last name: ")
     position = input("Position: ")
@@ -45,6 +70,15 @@ def add_player(lineup):
 
 #3 - Remove PLayer
 def remove_player(lineup):
+    """
+    Remove a player from the lineup by lineup number.
+
+    Prompts the user for the player's lineup position, validates the input,
+    removes the player, and displays a confirmation message.
+
+    Args:
+        lineup: The lineup object that stores players.
+    """
     try:
         number = int(input("number: "))
         if number < 1 or number > len(lineup):
@@ -59,6 +93,15 @@ def remove_player(lineup):
 
 #4 - Move Player -- Still working on
 def move_player(lineup):
+    """
+    Move a player from one lineup position to another.
+
+    Prompts the user for the current player number and the new position,
+    validates both inputs, performs the move, and displays a confirmation.
+
+    Args:
+        lineup: The lineup object that stores players.
+    """
     try:
         current = int(input("# of the Player to move: "))
         if current < 1 or current > len(lineup):
@@ -82,6 +125,15 @@ def move_player(lineup):
 
 #5 - Edit player -- Still working on
 def edit_player_position(lineup):
+    """
+    Update the position of a player in the lineup.
+
+    Prompts the user for a lineup number and a new valid position, then
+    updates the selected player's position.
+
+    Args:
+        lineup: The lineup object that stores players.
+    """
     try:
         number = int(input("Postion number: "))
         if number < 1 or number > len(lineup):
@@ -102,8 +154,17 @@ def edit_player_position(lineup):
     lineup.edit_player_position(number, position)
     print(f"{player.full_name} updated")
 
-#5 - Edit player STATS -- Still working on
+#6 - Edit player STATS -- Still working on
 def edit_player_stats(lineup):
+    """
+    Update the at-bats and hits for a player in the lineup.
+
+    Prompts the user for a lineup number, at-bats, and hits. Validates the
+    entered stats before applying the update.
+
+    Args:
+        lineup: The lineup object that stores players.
+    """
     try:
         number = int(input("Postion number: "))
         if number < 1 or number > len(lineup):
@@ -128,8 +189,17 @@ def edit_player_stats(lineup):
     lineup.edit_player_stats(number, at_bats, hits)
     print(f"{player.full_name} updated")
 
-# want to allow as option 8 to call again
+#input for Game date
 def get_game_date():
+    """
+    Prompt the user to enter a game date.
+
+    Accepts a date in YYYY-MM-DD format. Returns None if the user leaves the
+    input blank. Re-prompts until a valid date or blank entry is provided.
+
+    Returns:
+        A date object representing the game date, or None if no date is entered.
+    """
     game_date_str = input("GAME DATE: ").strip()
     if game_date_str == "":
         return None
@@ -143,27 +213,44 @@ def get_game_date():
             if game_date_str == "":
                 return None
 
-# Displays of UI
+
+
+# =====================================================
+#                    Layout/Menu
+# =====================================================
 def display_menu(current_date, game_date):
+    """
+    Display the main program menu along with date information.
+
+    Shows the current date, the scheduled game date if available, the number
+    of days until the game, and the list of available menu options and
+    positions.
+
+    Args:
+        current_date: The current date.
+        game_date: The scheduled game date, or None if unknown.
+    """
     print(double_line)
-    print("                     Baseball Team Manager") #6 tabss used
+    print("                     Baseball Team Manager") #21x space used
     print()
-    print(f"CURRENT DATE:                                         {current_date:%Y-%m-%d}") #finding best format
+    print(f"CURRENT DATE:                                         {current_date:%Y-%m-%d}") #41x space used
     if game_date is None:
         print("GAME DATE:                                               Unknown")
     else:
-        print(f"GAME DATE:                                            {game_date:%Y-%m-%d}")
+        print(f"GAME DATE:                                            {game_date:%Y-%m-%d}") #45x space used
 
-    if game_date is not None:  #finding best format
+    #Dynamic spcaing for right aligned code
+    if game_date is not None:  
         days_until = (game_date - current_date).days
-        if days_until > 0  < 10:
-            print(f"DAYS UNTIL GAME:                                               {days_until}")
-        elif days_until >= 10:
-            print(f"DAYS UNTIL GAME:                                              {days_until}")
-        elif days_until >= 100:
-            print(f"DAYS UNTIL GAME:                                             {days_until}")
+        if days_until > 0:
+            label = "DAYS UNTIL GAME:"
+            total_width = 64
+            value = str(days_until)
 
-    #Base MEnu
+            spaces = total_width - len(label) - len(value)
+            print(label + " " * spaces + value)
+
+    #Base MEnu 
     print(double_line)
     print("MENU OPTIONS")
     print("1 - Display lineup")
@@ -172,53 +259,68 @@ def display_menu(current_date, game_date):
     print("4 - Move player")
     print("5 - Edit player position")
     print("6 - Edit player stats")
-    print("7 - Exit program")
+    print("7 - Update Game Date")
+    print("8 - Exit program")
     print()
     print("POSITIONS")
     print(", ".join(positions))
     print(single_line)
 
+
+# =====================================================
+#                  Main operation
+# =====================================================
 def main():
+    """
+    Run the main loop of the Baseball Team Manager program.
+
+    Loads the lineup from storage, gets the current and game dates, displays
+    the menu, processes user menu selections, and writes changes back to the
+    database when needed.
+    """
     lineup = db.read_lineup()
-    current_date = date.today() #Dates, still be adjusted
+    current_date = date.today() 
     game_date = get_game_date()
 
     while True:
         display_menu(current_date, game_date)
         choice = input("Menu option: ").strip()
 
-        match choice: #LOVE CASE, Always use when I can
+        #Case (better/cleaner then if's, simpler to add)
+        match choice: 
             case "1":
-                display_lineup(lineup)
+                display_lineup(lineup)      #Auto Displays
                 print()
                 print("~ Press Enter key to continue ~")
             case "2":
-                add_player(lineup)
+                add_player(lineup) #button 1-- pop up/title/label/input box
                 db.write_lineup(lineup)
                 print()
                 print("~ Press Enter key to continue ~")
             case "3":
-                remove_player(lineup)
+                remove_player(lineup) #button 2
                 db.write_lineup(lineup)
                 print()
                 print("~ Press Enter key to continue ~")
             case "4":
-                move_player(lineup)
+                move_player(lineup) #button 3
                 db.write_lineup(lineup)
                 print()
                 print("~ Press Enter key to continue ~")
             case "5":
-                edit_player_position(lineup)
+                edit_player_position(lineup) #button 4
                 db.write_lineup(lineup)
                 print()
                 print("~ Press Enter key to continue ~")
             case "6":
-                edit_player_stats(lineup)
+                edit_player_stats(lineup) #button 5
                 db.write_lineup(lineup)
                 print()
                 print("~ Press Enter key to continue ~")
-            case "7":
-                print("Program Ended")
+            case "7": #sneaky way, but just re-runs program to re-enter date ////// #button 1
+                main()
+            case "8":
+                print("Program Ended") #button 6
                 break
             case _:
                 print("Invalid try again.")
